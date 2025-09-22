@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  l2-code-test:
+    build: .
+    container_name: l2-code-test
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run start:dev
