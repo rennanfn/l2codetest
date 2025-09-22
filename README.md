@@ -74,5 +74,9 @@ Testes
 Para executar os testes unitários do projeto, rode o seguinte comando no terminal dentro do container da aplicação:
 
 Bash
-
 docker-compose exec app npm run test
+
+Database do prisma:
+DATABASE_URL="postgresql://postgres:admin@localhost:5432/postgres?schema=public"
+
+Lembrando que esta url é salva no arquivo .env, que não deve ser salvo no github

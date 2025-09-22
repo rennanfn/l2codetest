@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model building {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  room room[]
+}
+
+/// This model has been renamed to 'Renamedclass' during introspection, because the original name 'class' is reserved.
+model Renamedclass {
+  id             Int              @id @default(autoincrement())
+  subject_id     Int?
+  year           Int
+  semester       String           @db.VarChar(50)
+  code           String           @db.VarChar(50)
+  taught_by      Int?
+  subject        subject?         @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  professor      professor?       @relation(fields: [taught_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  class_schedule class_schedule[]
+
+  @@map("class")
+}
+
+model class_schedule {
+  id           Int           @id @default(autoincrement())
+  class_id     Int?
+  room_id      Int?
+  day_of_week  String        @db.VarChar(50)
+  start_time   DateTime      @db.Time(6)
+  end_time     DateTime      @db.Time(6)
+  Renamedclass Renamedclass? @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room         room?         @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model department {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  professor professor[]
+}
+
+model professor {
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(255)
+  department_id Int?
+  title_id      Int?
+  Renamedclass  Renamedclass[]
+  department    department?    @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  title         title?         @relation(fields: [title_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subject       subject[]
+}
+
+model room {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(255)
+  building_id    Int?
+  class_schedule class_schedule[]
+  building       building?        @relation(fields: [building_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model subject {
+  id                                                                Int                    @id @default(autoincrement())
+  code                                                              String                 @unique @db.VarChar(50)
+  name                                                              String                 @db.VarChar(255)
+  taught_by                                                         Int?
+  Renamedclass                                                      Renamedclass[]
+  professor                                                         professor?             @relation(fields: [taught_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subject_prerequisite_subject_prerequisite_prerequisiteidTosubject subject_prerequisite[] @relation("subject_prerequisite_prerequisiteidTosubject")
+  subject_prerequisite_subject_prerequisite_subject_idTosubject     subject_prerequisite[] @relation("subject_prerequisite_subject_idTosubject")
+}
+
+model subject_prerequisite {
+  id                                                   Int      @id @default(autoincrement())
+  subject_id                                           Int?
+  prerequisiteid                                       Int?
+  subject_subject_prerequisite_prerequisiteidTosubject subject? @relation("subject_prerequisite_prerequisiteidTosubject", fields: [prerequisiteid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subject_subject_prerequisite_subject_idTosubject     subject? @relation("subject_prerequisite_subject_idTosubject", fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model title {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  professor professor[]
+}
